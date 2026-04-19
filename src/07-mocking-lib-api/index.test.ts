@@ -10,50 +10,40 @@ describe('throttledGetDataFromApi', () => {
   });
 
   beforeEach(() => {
-    //spyGet?.mockClear();
-
+    throttledGetDataFromApi.cancel();
   });
 
   afterAll(() => {
     jest.useRealTimers();
   });
 
-  test(
-    'should create instance with provided base url',
-    async () => {
-      const spyCreate = jest.spyOn(axios, 'create');
-      await throttledGetDataFromApi(USERS_PATH);
-      jest.runAllTimers();
-      expect(spyCreate).toHaveBeenCalledWith({ baseURL: BASE_URL });
-    }
-  );
+  test('should create instance with provided base url', async () => {
+    const spyCreate = jest.spyOn(axios, 'create');
+    await throttledGetDataFromApi(USERS_PATH);
+    jest.runAllTimers();
+    expect(spyCreate).toHaveBeenCalledWith({ baseURL: BASE_URL });
+  });
 
-  test(
-    'should perform request to correct provided url',
-    async () => {
-      const spyGet = jest
+  test('should perform request to correct provided url', async () => {
+    const spyGet = jest
       .spyOn(axios.Axios.prototype, 'get')
       .mockImplementation(async () => ({ data: {} }));
-      await throttledGetDataFromApi(USERS_PATH);
-      jest.runAllTimers();
-      expect(spyGet).toBeCalledWith(USERS_PATH);
-    }
-  );
+    await throttledGetDataFromApi(USERS_PATH);
+    jest.runAllTimers();
+    expect(spyGet).toBeCalledWith(USERS_PATH);
+  });
 
-  test(
-    'should return response data',
-    async () => {
-      let mockingData = [
-        { id: '1', name: 'test' },
-        { id: '2', name: 'denis' }
-      ];
-      const spyGet = jest
+  test('should return response data', async () => {
+    const mockingData = [
+      { id: '1', name: 'test' },
+      { id: '2', name: 'denis' },
+    ];
+    const spyGet = jest
       .spyOn(axios.Axios.prototype, 'get')
       .mockImplementation(async () => ({ data: mockingData }));
-      
-      const users = await throttledGetDataFromApi(USERS_PATH);
-      expect(spyGet).toBeCalledWith(USERS_PATH);
-      expect(users).toEqual(mockingData);
-    }
-  );
+
+    const users = await throttledGetDataFromApi(USERS_PATH);
+    expect(spyGet).toBeCalledWith(USERS_PATH);
+    expect(users).toEqual(mockingData);
+  });
 });
